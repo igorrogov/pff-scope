@@ -1,9 +1,22 @@
 package com.github.igorrogov.pffscope;
 
+import com.github.igorrogov.pffscope.ndb.Header;
+
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
 public class Main {
 
-	public static void main(String[] args) {
-		System.out.println("Test");
+	public static void main(String[] args)
+			  throws Exception
+	{
+		String pstFile = args[0];
+		System.out.println(pstFile);
+		try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(pstFile), StandardOpenOption.READ)) {
+			Header.parse(channel);
+		}
 	}
 
 }
