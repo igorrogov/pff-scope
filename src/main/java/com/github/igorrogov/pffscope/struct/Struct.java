@@ -1,61 +1,32 @@
 package com.github.igorrogov.pffscope.struct;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.nio.channels.SeekableByteChannel;
 
 public class Struct {
 
-	private final List<Field> fields;
+	@SuppressWarnings("unchecked")
+	public static <T extends Record> T parse(Class<T> cls, SeekableByteChannel channel)
+			  throws Exception
+	{
+		var c = (Constructor<T>) cls.getDeclaredConstructors()[0];
 
-	private Struct(List<Field> fields) {
-		this.fields = fields;
+		Field[] fields = cls.getDeclaredFields();
+		Object[] args = new Object[fields.length];
+		for (int i = 0; i < fields.length; i++) {
+			args[i] = createField(fields[i], channel);
+		}
+
+		return c.newInstance(args);
 	}
 
-	public Map<Field, byte[]> parse(ByteBuffer bb) {
-		Map<Field, byte[]> result = new HashMap<>();
-		for (Field field : fields) {
-			if (field.skip) {
-				bb.position(bb.position() + field.size);
-			}
-			else {
-				byte[] bytes = new byte[field.size];
-				bb.get(bytes);
-				result.put(field, bytes);
-			}
-		}
-		return result;
-	}
-
-	public static class Builder {
-
-		private final List<Field> fields = new ArrayList<>();
-
-		public Builder field(Field field) {
-			fields.add(field);
-			return this;
-		}
-
-		public Builder skip(String name, int size) {
-			fields.add(new Field(name, size, true));
-			return this;
-		}
-
-		public Struct build() {
-			return new Struct(Collections.unmodifiableList(fields));
-		}
-
-	}
-
-	public record Field(String name, int size, boolean skip) {
-
-		public static Field create(String name, int size) {
-			return new Field(name, size, false);
-		}
-
+	private static Object createField(Field field, SeekableByteChannel channel)
+			  throws IOException
+	{
+		StructField ft = field.getAnnotation(StructField.class);
+		return ft.type().read.read(channel);
 	}
 
 }

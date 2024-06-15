@@ -1,40 +1,31 @@
 package com.github.igorrogov.pffscope.ndb;
 
-import com.github.igorrogov.pffscope.struct.Struct;
-import com.github.igorrogov.pffscope.struct.Struct.Field;
+import com.github.igorrogov.pffscope.struct.StructField;
+import com.github.igorrogov.pffscope.struct.FieldType;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
+public record Header(
 
-public class Header {
+	@StructField(type = FieldType.UInt32)
+	long dwMagic,
 
-	private static final Field dwMagic = Field.create("dwMagic", 32);
+	@StructField(type = FieldType.UInt32)
+	long dwCRCPartial,
 
-	private static final Struct HEADER = new Struct.Builder()
-			  .field(dwMagic)
-			  .skip("dwCRCPartial", 32)
-			  .build();
+	@StructField(type = FieldType.UInt16)
+	int wMagicClient,
 
-	public static Header parse(SeekableByteChannel fc)
-			  throws IOException
-	{
-		ByteBuffer bb = ByteBuffer.allocate(64);
-		fc.read(bb);
-		bb.flip();
+	@StructField(type = FieldType.UInt16)
+	int wVer,
 
-		var result = HEADER.parse(bb);
-		validateMagic(result.get(dwMagic));
+	@StructField(type = FieldType.UInt16)
+	int wVerClient,
 
-		return new Header();
-	}
+	@StructField(type = FieldType.UInt8)
+	int bPlatformCreate,
 
-	private static void validateMagic(byte[] magicBytes) {
-		// TODO:
-	}
+	@StructField(type = FieldType.UInt8)
+	int bPlatformAccess
 
-	private Header() {
-
-	}
-
+	)
+{
 }
