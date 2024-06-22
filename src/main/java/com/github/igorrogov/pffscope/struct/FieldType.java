@@ -1,7 +1,7 @@
 package com.github.igorrogov.pffscope.struct;
 
 import java.io.IOException;
-import java.nio.channels.SeekableByteChannel;
+import java.nio.channels.ReadableByteChannel;
 
 public enum FieldType {
 
@@ -20,7 +20,7 @@ public enum FieldType {
 
 	public interface ReadFunction {
 
-		Object read(SeekableByteChannel channel) throws IOException;
+		Object read(ReadableByteChannel channel) throws IOException;
 
 	}
 

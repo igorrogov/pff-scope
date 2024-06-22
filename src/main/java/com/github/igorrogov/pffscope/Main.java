@@ -1,7 +1,8 @@
 package com.github.igorrogov.pffscope;
 
 import com.github.igorrogov.pffscope.ndb.Header;
-import com.github.igorrogov.pffscope.struct.Struct;
+import com.github.igorrogov.pffscope.ndb.Root;
+import com.github.igorrogov.pffscope.struct.StructFactory;
 
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
@@ -16,8 +17,11 @@ public class Main {
 		String pstFile = args[0];
 		System.out.println(pstFile);
 		try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(pstFile), StandardOpenOption.READ)) {
-			Header header = Struct.parse(Header.class, channel);
+			Header header = StructFactory.parse(Header.class, channel);
 			System.out.println(header);
+
+			Root root = StructFactory.parse(Root.class, header.root());
+			System.out.println(root);
 		}
 	}
 
