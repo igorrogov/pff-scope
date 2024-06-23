@@ -21,7 +21,7 @@ public class StructFactory {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends Struct> T parse(Class<T> cls, ReadableByteChannel channel)
-			  throws Exception
+			  throws IOException
 	{
 		var c = (Constructor<T>) cls.getDeclaredConstructors()[0];
 
@@ -34,7 +34,12 @@ public class StructFactory {
 			args[i] = createFieldArgument(fields.get(i), channel);
 		}
 
-		return c.newInstance(args);
+		try {
+			return c.newInstance(args);
+		}
+		catch (Exception e) {
+			throw new IOException(e);
+		}
 	}
 
 	private static int getSortIndex(Field field) {
