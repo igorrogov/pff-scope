@@ -1,85 +1,81 @@
 package com.github.igorrogov.pffscope.ndb;
 
-import com.github.igorrogov.pffscope.struct.Bytes;
-import com.github.igorrogov.pffscope.struct.Index;
-import com.github.igorrogov.pffscope.struct.SkipField;
-import com.github.igorrogov.pffscope.struct.Struct;
-import com.github.igorrogov.pffscope.struct.Type;
+import com.github.igorrogov.pffscope.struct.StructFactory;
+import org.apache.commons.lang3.StringUtils;
 
-import static com.github.igorrogov.pffscope.struct.FieldType.*;
+import java.io.IOException;
+import java.nio.channels.ReadableByteChannel;
+import java.util.Arrays;
+import java.util.HexFormat;
 
 public record Header(
+		  ClientSignature clientSignature,
+		  String clientSignatureText,
+		  Format format,
+		  String formatText
+) {
 
-	@Index(0)
-	@Type(UInt32)
-	long dwMagic,
+	public static Header parse(ReadableByteChannel channel)
+			  throws IOException
+	{
+		HeaderStruct hs = StructFactory.parse(HeaderStruct.class, channel);
 
-	@Index(1)
-	@Type(UInt32)
-	long dwCRCPartial,
+		ClientSignature cs = ClientSignature.forValue(hs.wMagicClient());
+		Format format = Format.forValue(hs.wVer());
 
-	@Index(2)
-	@Type(UInt16)
-	int wMagicClient,
+		return new Header(cs, getClientSignatureText(cs, hs.wMagicClient()), format, getFormatText(format, hs.wVer()));
+	}
 
-	@Index(3)
-	@Type(UInt16)
-	int wVer,
+	private static final HexFormat HEX = HexFormat.of().withLowerCase();
 
-	@Index(4)
-	@Type(UInt16)
-	int wVerClient,
+	private static String getClientSignatureText(ClientSignature cs, int value) {
+		String hex = StringUtils.stripStart(HEX.toHexDigits(value), "0");
+		return (cs != null ? cs.name() : "Unknown") + " (" + hex + ")";
+	}
 
-	@Index(5)
-	@Type(UInt8)
-	int bPlatformCreate,
+	private static String getFormatText(Format format, int value) {
+		String hex = StringUtils.stripStart(HEX.toHexDigits(value), "0");
+		return (format != null ? format.name() : "Unknown") + " (" + hex + ")";
+	}
 
-	@Index(6)
-	@Type(UInt8)
-	int bPlatformAccess,
+	public enum ClientSignature {
+		PAB(0x4241),
+		PST(0x4d53),
+		OST(0x4f53);
 
-	/*
-	 * dwReserved1		4 bytes
-	 * dwReserved2		4 bytes
-	 * bidUnused		8 bytes
-	 * bidNextP			8 bytes
-	 * dwUnique			4 bytes
-	 * rgnid[]			128 bytes
-	 * qwUnused			8 bytes
-	 */
-	@Index(7)
-	@SkipField(4 + 4 + 8 + 8 + 4 + 128 + 8)
-	Object unusedFieldsBeforeRoot,
+		public final int value;
 
-	@Index(8)
-	@Bytes(72)
-	byte[] root,
+		ClientSignature(int value) {
+			this.value = value;
+		}
 
-  /*
-	* dwAlign		4 bytes
-	* rgbFM			128 bytes
-	* rgbFP			128 bytes
-	* bSentinel		1 byte
-	*/
-	@Index(9)
-	@SkipField(4 + 128 + 128 + 1)
-	Object unusedFieldsAfterRoot,
+		public static ClientSignature forValue(int value) {
+			return Arrays.stream(ClientSignature.values()).filter(c -> c.value == value).findFirst().orElse(null);
+		}
 
-	@Index(10)
-	@Type(UInt8)
-	int bCryptMethod,
+	}
 
-  /*
-	* rgbReserved	2 bytes
-	* bidNextB		8 bytes
-	* dwCRCFull		4 bytes
-	* rgbReserved2	3 bytes
-	* bReserved		1 byte
-	* rgbReserved3	32 bytes
-	*/
-	@Index(11)
-	@SkipField(2 + 8 + 4 + 3 + 1 + 32)
-	Object unusedFieldsAfterCrypt
+	public enum Format {
+		Ansi(0x0F),	// 15
+		Unicode(0x17), // 23
+		Unicode4k(0x24); // 36
 
-	) implements Struct {
+		public final int minValue;
+
+		Format(int minValue) {
+			this.minValue = minValue;
+		}
+
+		public static Format forValue(int value) {
+			if (value <= Ansi.minValue) {
+				return Ansi;
+			}
+			if (value >= Unicode4k.minValue) {
+				return Unicode4k;
+			}
+			return Unicode;
+		}
+
+	}
+
 }
