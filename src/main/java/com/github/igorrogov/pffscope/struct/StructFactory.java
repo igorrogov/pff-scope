@@ -14,7 +14,7 @@ import java.util.List;
 public class StructFactory {
 
 	public static <T extends Struct> T parse(Class<T> cls, byte[] bytes)
-			  throws Exception
+			  throws IOException
 	{
 		return parse(cls, Channels.newChannel(new ByteArrayInputStream(bytes)));
 	}

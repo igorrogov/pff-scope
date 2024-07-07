@@ -1,18 +1,22 @@
 package com.github.igorrogov.pffscope.ndb;
 
 import com.github.igorrogov.pffscope.struct.StructFactory;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Arrays;
-import java.util.HexFormat;
 
 public record Header(
 		  ClientSignature clientSignature,
-		  String clientSignatureText,
+		  int clientSignatureRaw,
 		  Format format,
-		  String formatText
+		  int formatRaw,
+		  int clientVersion,
+		  CryptMethod cryptMethod,
+		  int CryptMethodRaw,
+		  long fileSize,
+		  BRef nodeTreeRoot,
+		  BRef blockTreeRoot
 ) {
 
 	public static Header parse(ReadableByteChannel channel)
@@ -22,21 +26,23 @@ public record Header(
 
 		ClientSignature cs = ClientSignature.forValue(hs.wMagicClient());
 		Format format = Format.forValue(hs.wVer());
+		CryptMethod cryptMethod = CryptMethod.forValue(hs.bCryptMethod());
 
-		return new Header(cs, getClientSignatureText(cs, hs.wMagicClient()), format, getFormatText(format, hs.wVer()));
+		// TODO: parse rgnid[] 128 bytes
+		// it could be useful to provide some stats about the PST file in general (e.g. number of items per type)
+
+		RootStruct rs = StructFactory.parse(RootStruct.class, hs.root());
+		BRefStruct nr = StructFactory.parse(BRefStruct.class, rs.brefNBT());
+		BRefStruct br = StructFactory.parse(BRefStruct.class, rs.brefBBT());
+
+		BRef nodeTreeRoot = new BRef(BlockID.parse(nr.blockID()), nr.offset());
+		BRef blockTreeRoot = new BRef(BlockID.parse(br.blockID()), br.offset());
+
+		return new Header(cs, hs.wMagicClient(), format, hs.wVer(), hs.wVerClient(), cryptMethod,
+				  hs.bCryptMethod(), rs.ibFileEof(), nodeTreeRoot, blockTreeRoot);
 	}
 
-	private static final HexFormat HEX = HexFormat.of().withLowerCase();
-
-	private static String getClientSignatureText(ClientSignature cs, int value) {
-		String hex = StringUtils.stripStart(HEX.toHexDigits(value), "0");
-		return (cs != null ? cs.name() : "Unknown") + " (" + hex + ")";
-	}
-
-	private static String getFormatText(Format format, int value) {
-		String hex = StringUtils.stripStart(HEX.toHexDigits(value), "0");
-		return (format != null ? format.name() : "Unknown") + " (" + hex + ")";
-	}
+//	private static final HexFormat HEX = HexFormat.of().withLowerCase();
 
 	public enum ClientSignature {
 		PAB(0x4241),
@@ -74,6 +80,24 @@ public record Header(
 				return Unicode4k;
 			}
 			return Unicode;
+		}
+
+	}
+
+	public enum CryptMethod {
+		None(0x00),
+		Permute(0x01),
+		Cyclic(0x02),
+		EdpCrypted(0x10);
+
+		public final int value;
+
+		CryptMethod(int value) {
+			this.value = value;
+		}
+
+		public static CryptMethod forValue(int value) {
+			return Arrays.stream(CryptMethod.values()).filter(c -> c.value == value).findFirst().orElse(null);
 		}
 
 	}

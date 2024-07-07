@@ -1,11 +1,6 @@
 package com.github.igorrogov.pffscope;
 
-import com.github.igorrogov.pffscope.ndb.BRef;
 import com.github.igorrogov.pffscope.ndb.Header;
-import com.github.igorrogov.pffscope.ndb.HeaderStruct;
-import com.github.igorrogov.pffscope.ndb.Page;
-import com.github.igorrogov.pffscope.ndb.Root;
-import com.github.igorrogov.pffscope.struct.StructFactory;
 
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
