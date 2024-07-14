@@ -1,8 +1,11 @@
 package com.github.igorrogov.pffscope.ui;
 
+import com.github.igorrogov.pffscope.Pst;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.nio.file.Path;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -13,6 +16,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 public class MainFrame extends JFrame {
@@ -21,7 +25,7 @@ public class MainFrame extends JFrame {
 
 	private PropertiesPanel propertiesPanel;
 
-	private MainFrame()
+	private MainFrame(Path path)
 			  throws Exception
 	{
 		setTitle("pff-scope");
@@ -37,6 +41,8 @@ public class MainFrame extends JFrame {
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
+
+		loadPst(path);
 	}
 
 	private void createPanel() {
@@ -54,6 +60,30 @@ public class MainFrame extends JFrame {
 		splitPane.setDividerLocation(200);
 
 		add(splitPane);
+	}
+
+	private void loadPst(Path path) {
+		var worker = new SwingWorker<Pst, Void>() {
+			@Override
+			protected Pst doInBackground()
+					  throws Exception
+			{
+				return new Pst(path);
+			}
+
+			@Override
+			protected void done() {
+				try {
+					Pst pst = get();
+					treePanel.add(pst);
+					propertiesPanel.show(pst);
+				}
+				catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
+		worker.execute();
 	}
 
 	private class MainMenu extends JMenuBar {
@@ -80,7 +110,7 @@ public class MainFrame extends JFrame {
 	public static void main(String[] args)
 			  throws Exception
 	{
-		new MainFrame();
+		new MainFrame(Path.of(args[0]));
 	}
 
 }

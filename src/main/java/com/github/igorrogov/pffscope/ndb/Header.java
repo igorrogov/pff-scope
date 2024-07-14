@@ -13,7 +13,7 @@ public record Header(
 		  int formatRaw,
 		  int clientVersion,
 		  CryptMethod cryptMethod,
-		  int CryptMethodRaw,
+		  int cryptMethodRaw,
 		  long fileSize,
 		  BRef nodeTreeRoot,
 		  BRef blockTreeRoot
@@ -41,8 +41,6 @@ public record Header(
 		return new Header(cs, hs.wMagicClient(), format, hs.wVer(), hs.wVerClient(), cryptMethod,
 				  hs.bCryptMethod(), rs.ibFileEof(), nodeTreeRoot, blockTreeRoot);
 	}
-
-//	private static final HexFormat HEX = HexFormat.of().withLowerCase();
 
 	public enum ClientSignature {
 		PAB(0x4241),

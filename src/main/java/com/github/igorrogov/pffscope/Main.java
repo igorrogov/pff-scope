@@ -1,11 +1,6 @@
 package com.github.igorrogov.pffscope;
 
-import com.github.igorrogov.pffscope.ndb.Header;
-
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
 public class Main {
 
@@ -14,9 +9,8 @@ public class Main {
 	{
 		String pstFile = args[0];
 		System.out.println(pstFile);
-		try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(pstFile), StandardOpenOption.READ)) {
-			Header header = Header.parse(channel);
-			System.out.println(header);
+		Pst pst = new Pst(Paths.get(pstFile));
+		System.out.println(pst.header);
 
 //			Root root = StructFactory.parse(Root.class, headerStruct.root());
 //			System.out.println(root);
@@ -28,7 +22,6 @@ public class Main {
 //			Page rootNodePage = Page.read(channel, brefNBT);
 //			Page rootBlockPage = Page.read(channel, brefBBT);
 //			System.out.println("rootNodePage: " + rootNodePage + ", rootBlockPage: " + rootBlockPage);
-		}
 	}
 
 }
