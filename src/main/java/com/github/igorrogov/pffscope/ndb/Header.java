@@ -32,14 +32,9 @@ public record Header(
 		// it could be useful to provide some stats about the PST file in general (e.g. number of items per type)
 
 		RootStruct rs = StructFactory.parse(RootStruct.class, hs.root());
-		BRefStruct nr = StructFactory.parse(BRefStruct.class, rs.brefNBT());
-		BRefStruct br = StructFactory.parse(BRefStruct.class, rs.brefBBT());
-
-		BRef nodeTreeRoot = new BRef(BlockID.parse(nr.blockID()), nr.offset());
-		BRef blockTreeRoot = new BRef(BlockID.parse(br.blockID()), br.offset());
 
 		return new Header(cs, hs.wMagicClient(), format, hs.wVer(), hs.wVerClient(), cryptMethod,
-				  hs.bCryptMethod(), rs.ibFileEof(), nodeTreeRoot, blockTreeRoot);
+				  hs.bCryptMethod(), rs.ibFileEof(), BRef.from(rs.brefNBT()), BRef.from(rs.brefBBT()));
 	}
 
 	public enum ClientSignature {

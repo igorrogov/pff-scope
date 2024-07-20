@@ -1,27 +1,33 @@
 package com.github.igorrogov.pffscope;
 
-import java.nio.file.Paths;
+import com.github.igorrogov.pffscope.ndb.Page;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 public class Main {
 
 	public static void main(String[] args)
 			  throws Exception
 	{
-		String pstFile = args[0];
+		Path pstFile = Path.of(args[0]);
 		System.out.println(pstFile);
-		Pst pst = new Pst(Paths.get(pstFile));
-		System.out.println(pst.header);
+		Pst pst = new Pst(pstFile);
+		System.out.println(pp(pst.header));
 
-//			Root root = StructFactory.parse(Root.class, headerStruct.root());
-//			System.out.println(root);
+		try (SeekableByteChannel channel = Files.newByteChannel(pstFile, StandardOpenOption.READ)) {
+			Page rootNodePage = Page.read(channel, pst.header.nodeTreeRoot());
+			Page rootBlockPage = Page.read(channel, pst.header.blockTreeRoot());
+			System.out.println(" rootNodePage: \n" + pp(rootNodePage) + "\n rootBlockPage: \n" + pp(rootBlockPage));
+		}
+	}
 
-//			BRef brefNBT = StructFactory.parse(BRef.class, root.brefNBT());
-//			BRef brefBBT = StructFactory.parse(BRef.class, root.brefBBT());
-//			System.out.println("nbt: " + brefNBT + ", bbt: " + brefBBT);
-//
-//			Page rootNodePage = Page.read(channel, brefNBT);
-//			Page rootBlockPage = Page.read(channel, brefBBT);
-//			System.out.println("rootNodePage: " + rootNodePage + ", rootBlockPage: " + rootBlockPage);
+	private static String pp(Object object) {
+		return ReflectionToStringBuilder.toString(object, ToStringStyle.MULTI_LINE_STYLE);
 	}
 
 }
