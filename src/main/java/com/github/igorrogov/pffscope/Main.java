@@ -23,6 +23,17 @@ public class Main {
 			Page rootNodePage = Page.read(channel, pst.header.nodeTreeRoot());
 			Page rootBlockPage = Page.read(channel, pst.header.blockTreeRoot());
 			System.out.println(" rootNodePage: \n" + pp(rootNodePage) + "\n rootBlockPage: \n" + pp(rootBlockPage));
+
+			// load child entries of the root node
+			System.out.println("\n ------------------------------");
+			for (Page child : rootNodePage.readSubPages(channel)) {
+				System.out.println("\n" + pp(child));
+			}
+
+//			System.out.println("\n ------------------------------");
+//			for (Page child : rootBlockPage.readSubPages(channel)) {
+//				System.out.println("\n" + pp(child));
+//			}
 		}
 	}
 
