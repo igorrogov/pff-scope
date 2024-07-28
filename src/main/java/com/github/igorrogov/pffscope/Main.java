@@ -1,13 +1,13 @@
 package com.github.igorrogov.pffscope;
 
+import com.github.igorrogov.pffscope.ndb.NBTreeEntry;
+import com.github.igorrogov.pffscope.ndb.NodeType;
 import com.github.igorrogov.pffscope.ndb.Page;
+import org.apache.commons.io.HexDump;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 
 public class Main {
 
@@ -16,24 +16,30 @@ public class Main {
 	{
 		Path pstFile = Path.of(args[0]);
 		System.out.println(pstFile);
-		Pst pst = new Pst(pstFile);
-		System.out.println(pp(pst.header));
+		try (Pst pst = new Pst(pstFile)) {
+			System.out.println(pp(pst.header));
 
-		try (SeekableByteChannel channel = Files.newByteChannel(pstFile, StandardOpenOption.READ)) {
-			Page rootNodePage = Page.read(channel, pst.header.nodeTreeRoot());
-			Page rootBlockPage = Page.read(channel, pst.header.blockTreeRoot());
+			Page rootNodePage = pst.getRootNodePage();
+			Page rootBlockPage = pst.getRootBlockPage();
 			System.out.println(" rootNodePage: \n" + pp(rootNodePage) + "\n rootBlockPage: \n" + pp(rootBlockPage));
 
-			// load child entries of the root node
-			System.out.println("\n ------------------------------");
-			for (Page child : rootNodePage.readSubPages(channel)) {
-				System.out.println("\n" + pp(child));
+			System.out.println("nodes: " + pst.nodes.size());
+			System.out.println("blocks: " + pst.blocks.size());
+
+			// find first folder that is not root (parent NID != own NID)
+			NBTreeEntry folder = pst.nodes.stream()
+					  .filter(n -> n.nid().type() == NodeType.NormalFolder && !n.nid().equals(n.parent()))
+					  .findFirst()
+					  .orElse(null);
+			if (folder == null) {
+				System.out.println("no folder found");
+				return;
 			}
 
-//			System.out.println("\n ------------------------------");
-//			for (Page child : rootBlockPage.readSubPages(channel)) {
-//				System.out.println("\n" + pp(child));
-//			}
+			System.out.println("\n\n folder: " + pp(folder));
+			System.out.println("\n\n folder data entry: " + pp(pst.getBlockEntry(folder.data())));
+			System.out.println("");
+			HexDump.dump(pst.getNodeData(folder), System.out);
 		}
 	}
 
