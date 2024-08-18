@@ -1,5 +1,6 @@
 package com.github.igorrogov.pffscope;
 
+import com.github.igorrogov.pffscope.ltp.HeapHeader;
 import com.github.igorrogov.pffscope.ndb.NBTreeEntry;
 import com.github.igorrogov.pffscope.ndb.NodeType;
 import com.github.igorrogov.pffscope.ndb.Page;
@@ -39,7 +40,10 @@ public class Main {
 			System.out.println("\n\n folder: " + pp(folder));
 			System.out.println("\n\n folder data entry: " + pp(pst.getBlockEntry(folder.data())));
 			System.out.println("");
-			HexDump.dump(pst.getNodeData(folder), System.out);
+			byte[] nodeData = pst.getNodeData(folder);
+			HexDump.dump(nodeData, System.out);
+
+			System.out.println("\n\n heap header: " + pp(HeapHeader.parse(nodeData)));
 		}
 	}
 
