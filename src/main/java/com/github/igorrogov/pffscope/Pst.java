@@ -92,7 +92,7 @@ public class Pst implements AutoCloseable {
 		BlockID data = node.data();
 		BBTreeEntry entry = getBlockEntry(data);
 		byte[] bytes = BRef.read(channel, entry.bRef(), entry.size());
-		// TODO: implement proper decryption based on header info
+		// TODO: implement proper decryption based on header info (select Encryption type)
 		PermuteDecryptor.decrypt(bytes);
 		return bytes;
 	}
