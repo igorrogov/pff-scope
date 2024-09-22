@@ -1,9 +1,9 @@
 package com.github.igorrogov.pffscope;
 
 import com.github.igorrogov.pffscope.ltp.HeapHeader;
-import com.github.igorrogov.pffscope.ndb.NBTreeEntry;
+import com.github.igorrogov.pffscope.ndb.internal.NBTreeEntry;
 import com.github.igorrogov.pffscope.ndb.NodeType;
-import com.github.igorrogov.pffscope.ndb.Page;
+import com.github.igorrogov.pffscope.ndb.internal.Page;
 import org.apache.commons.io.HexDump;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;

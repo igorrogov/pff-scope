@@ -1,4 +1,4 @@
-package com.github.igorrogov.pffscope.ndb;
+package com.github.igorrogov.pffscope.ndb.internal;
 
 public class PermuteDecryptor {
 

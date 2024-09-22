@@ -1,4 +1,4 @@
-package com.github.igorrogov.pffscope.ndb;
+package com.github.igorrogov.pffscope.ndb.internal;
 
 /**
  * BID (Block ID) - Every block allocated in the PST file is identified using the BID structure.

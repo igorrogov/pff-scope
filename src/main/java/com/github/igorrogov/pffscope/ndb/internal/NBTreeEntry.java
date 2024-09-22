@@ -1,14 +1,16 @@
-package com.github.igorrogov.pffscope.ndb;
+package com.github.igorrogov.pffscope.ndb.internal;
+
+import com.github.igorrogov.pffscope.ndb.NID;
 
 /**
  * Intermediate BTree entry (cLevel > 0).
  */
 public record NBTreeEntry(
 
-		  NodeID nid,
+		  NID nid,
 		  BlockID data,
 		  BlockID sub,
-		  NodeID parent
+		  NID parent
 
 ) {
 

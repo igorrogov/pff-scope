@@ -1,4 +1,4 @@
-package com.github.igorrogov.pffscope.ndb;
+package com.github.igorrogov.pffscope.ndb.internal;
 
 import com.github.igorrogov.pffscope.struct.Bytes;
 import com.github.igorrogov.pffscope.struct.Index;

@@ -1,5 +1,6 @@
-package com.github.igorrogov.pffscope.ndb;
+package com.github.igorrogov.pffscope.ndb.internal;
 
+import com.github.igorrogov.pffscope.ndb.NID;
 import com.github.igorrogov.pffscope.struct.StructFactory;
 
 import java.io.IOException;
@@ -77,10 +78,10 @@ public record Page(
 				else if (type == PageType.NodeBTree) {
 					var es = StructFactory.parse(NBTreeEntryStruct.class, channel);
 					nodes.add(new NBTreeEntry(
-							  NodeID.parse(es.nid()),
+							  NID.parse(es.nid()),
 							  BlockID.parse(es.bidData()),
 							  BlockID.parse(es.bidSub()),
-							  NodeID.parse(es.nidParent())));
+							  NID.parse(es.nidParent())));
 				}
 				else if (type == PageType.BlockBTree) {
 					var es = StructFactory.parse(BBTreeEntryStruct.class, channel);

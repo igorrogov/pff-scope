@@ -1,7 +1,7 @@
 package com.github.igorrogov.pffscope.ui;
 
 import com.github.igorrogov.pffscope.Pst;
-import com.github.igorrogov.pffscope.ndb.Header;
+import com.github.igorrogov.pffscope.ndb.internal.Header;
 import org.apache.commons.lang3.StringUtils;
 
 import java.awt.BorderLayout;

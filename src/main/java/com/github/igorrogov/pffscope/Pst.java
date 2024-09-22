@@ -1,12 +1,12 @@
 package com.github.igorrogov.pffscope;
 
-import com.github.igorrogov.pffscope.ndb.BBTreeEntry;
-import com.github.igorrogov.pffscope.ndb.BRef;
-import com.github.igorrogov.pffscope.ndb.BlockID;
-import com.github.igorrogov.pffscope.ndb.Header;
-import com.github.igorrogov.pffscope.ndb.NBTreeEntry;
-import com.github.igorrogov.pffscope.ndb.Page;
-import com.github.igorrogov.pffscope.ndb.PermuteDecryptor;
+import com.github.igorrogov.pffscope.ndb.internal.BBTreeEntry;
+import com.github.igorrogov.pffscope.ndb.internal.BRef;
+import com.github.igorrogov.pffscope.ndb.internal.BlockID;
+import com.github.igorrogov.pffscope.ndb.internal.Header;
+import com.github.igorrogov.pffscope.ndb.internal.NBTreeEntry;
+import com.github.igorrogov.pffscope.ndb.internal.Page;
+import com.github.igorrogov.pffscope.ndb.internal.PermuteDecryptor;
 
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
