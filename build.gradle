@@ -6,6 +6,11 @@ application {
     mainClass = 'com.github.igorrogov.pffscope.Main'
 }
 
+java {
+    sourceCompatibility = "23"
+    targetCompatibility = "23"
+}
+
 repositories {
     mavenCentral()
 }

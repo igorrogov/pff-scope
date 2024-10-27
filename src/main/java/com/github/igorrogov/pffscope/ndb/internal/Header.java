@@ -24,6 +24,8 @@ public record Header(
 	{
 		HeaderStruct hs = StructFactory.parse(HeaderStruct.class, channel);
 
+		System.out.println("dwMagic: " + hs.dwMagic());
+
 		ClientSignature cs = ClientSignature.forValue(hs.wMagicClient());
 		Format format = Format.forValue(hs.wVer());
 		CryptMethod cryptMethod = CryptMethod.forValue(hs.bCryptMethod());
