@@ -1,6 +1,7 @@
 package com.github.igorrogov.pffscope;
 
 import com.github.igorrogov.pffscope.memory.HeaderSegment;
+import com.github.igorrogov.pffscope.memory.SegmentParser;
 
 import java.lang.foreign.Arena;
 import java.nio.channels.FileChannel;

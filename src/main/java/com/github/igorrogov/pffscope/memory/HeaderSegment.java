@@ -1,30 +1,20 @@
 package com.github.igorrogov.pffscope.memory;
 
-import com.github.igorrogov.pffscope.ndb.internal.Header;
+import com.github.igorrogov.pffscope.memory.SegmentParser.Field;
 
-import java.lang.foreign.MemoryLayout;
-import java.lang.foreign.MemoryLayout.PathElement;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
+
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
 public class HeaderSegment {
 
-	private final static MemoryLayout HEADER = MemoryLayout.structLayout(
+	private static final Field<Integer, Long> DW_MAGIC = SegmentParser.newUInt32();
 
-			  ValueLayout.JAVA_INT
-						 .withOrder(ByteOrder.LITTLE_ENDIAN)
-						 .withName("dwMagic")
-
-	);
-
-	private final static VarHandle DW_MAGIC = HEADER.varHandle(PathElement.groupElement("dwMagic"));
+	private static final SegmentParser HEADER_PARSER = SegmentParser.build(LITTLE_ENDIAN, DW_MAGIC);
 
 	public static void parse(MemorySegment ms) {
-		int magic = (int) DW_MAGIC.get(ms, 0);
+		long magic = HEADER_PARSER.get(ms, DW_MAGIC);
 		System.out.println("magic: " + magic);
-		System.out.println("var handle: " + DW_MAGIC.coordinateTypes());
 	}
 
 }
